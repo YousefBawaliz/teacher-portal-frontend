@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import TestRunnerPage from './pages/TestRunnerPage.vue';
+import TeacherServiceTestPage from './pages/TeacherServiceTestPage.vue';
 </script>
 
 <template>
@@ -11,7 +12,8 @@ import TestRunnerPage from './pages/TestRunnerPage.vue';
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
   </div>
-  <TestRunnerPage />
+  <!-- <TestRunnerPage /> -->
+  <TeacherServiceTestPage />
 </template>
 
 <style scoped>

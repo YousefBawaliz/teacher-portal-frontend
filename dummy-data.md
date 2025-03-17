@@ -2,6 +2,8 @@
 
 This document provides a comprehensive overview of all test/dummy data used to initialize the Student Portal application database.
 
+note that ID are incremental. e.g 1,2,3,....
+
 ## Users
 
 ### Admin

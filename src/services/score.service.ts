@@ -1,7 +1,7 @@
 import api from './api';
 import type { ApiResponse, PaginatedResponse } from '@/types/api.types';
 
-interface Score {
+export interface Score {
   id: string;
   assessment_id: string;
   student_id: string;
@@ -11,19 +11,19 @@ interface Score {
   graded_at?: string;
 }
 
-interface CreateScoreData {
+export interface CreateScoreData {
   assessment_id: string;
   student_id: string;
   score: number;
   feedback?: string;
 }
 
-interface UpdateScoreData {
+export interface UpdateScoreData {
   score?: number;
   feedback?: string;
 }
 
-interface BatchScoreData {
+export interface BatchScoreData {
   scores: Array<{
     student_id: string;
     score: number;
