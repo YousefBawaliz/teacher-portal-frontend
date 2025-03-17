@@ -1,72 +1,65 @@
 import api from './api';
-import type { ApiResponse, PaginatedResponse } from '@/types/api.types';
+import type { ApiResponse } from '@/types/api.types';
 
 export interface Score {
-  id: string;
-  assessment_id: string;
-  student_id: string;
-  score: number;
+  id: number;
+  student_id: number;
+  assessment_id: number;
+  score_value: number;
+  submission_date: string;
   feedback?: string;
-  submitted_at: string;
-  graded_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CreateScoreData {
-  assessment_id: string;
-  student_id: string;
-  score: number;
+  student_id: number;
+  assessment_id: number;
+  score_value: number;
   feedback?: string;
 }
 
 export interface UpdateScoreData {
-  score?: number;
+  score_value?: number;
   feedback?: string;
 }
 
-export interface BatchScoreData {
-  scores: Array<{
-    student_id: string;
-    score: number;
-    feedback?: string;
-  }>;
-}
-
 export class ScoreService {
-  static async getScores(assessmentId: string, page = 1, perPage = 10): Promise<PaginatedResponse<Score>> {
-    const response = await api.get<PaginatedResponse<Score>>(`/api/assessments/${assessmentId}/scores`, {
-      params: { page, per_page: perPage }
-    });
-    return response.data;
-  }
-
-  static async getStudentScore(assessmentId: string, studentId: string): Promise<Score> {
-    const response = await api.get<Score>(`/api/assessments/${assessmentId}/scores/${studentId}`);
-    return response.data;
-  }
-
+  // Create a new score (teacher only)
   static async createScore(data: CreateScoreData): Promise<Score> {
-    const response = await api.post<Score>('/api/scores', data);
+    const response = await api.post<Score>('/api/scores/', data);
     return response.data;
   }
 
-  static async updateScore(scoreId: string, data: UpdateScoreData): Promise<Score> {
+  // Get a specific score
+  static async getScore(scoreId: number): Promise<Score> {
+    const response = await api.get<Score>(`/api/scores/${scoreId}`);
+    return response.data;
+  }
+
+  // Update a score (teacher only)
+  static async updateScore(scoreId: number, data: UpdateScoreData): Promise<Score> {
     const response = await api.put<Score>(`/api/scores/${scoreId}`, data);
     return response.data;
   }
 
-  static async deleteScore(scoreId: string): Promise<ApiResponse<void>> {
-    const response = await api.delete<ApiResponse<void>>(`/api/scores/${scoreId}`);
+  // Delete a score (teacher only)
+  static async deleteScore(scoreId: number): Promise<{ message: string }> {
+    const response = await api.delete<{ message: string }>(`/api/scores/${scoreId}`);
     return response.data;
   }
 
-  static async batchCreateScores(assessmentId: string, data: BatchScoreData): Promise<ApiResponse<void>> {
-    const response = await api.post<ApiResponse<void>>(`/api/assessments/${assessmentId}/scores/batch`, data);
+  // Get all scores for a student
+  static async getStudentScores(studentId: number): Promise<Score[]> {
+    const response = await api.get<Score[]>(`/api/scores/student/${studentId}`);
     return response.data;
   }
 
-  static async getStudentScores(studentId: string, classId?: string): Promise<Score[]> {
-    const params = classId ? { class_id: classId } : {};
-    const response = await api.get<Score[]>(`/api/students/${studentId}/scores`, { params });
+  // Get a student's score by assessment title
+  static async getStudentScoreByAssessment(studentId: number, assessmentTitle: string): Promise<Score> {
+    const response = await api.get<Score>(`/api/scores/student/${studentId}/assessment`, {
+      params: { title: assessmentTitle }
+    });
     return response.data;
   }
 }

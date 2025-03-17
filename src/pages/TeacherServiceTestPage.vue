@@ -121,13 +121,13 @@ const runTests = async () => {
     
     // Create assessment
     const newAssessmentData = {
-      class_id: classesResult.data[0].id,
-      title: `Assessment Test ${new Date().toISOString()}`,
-      type: 'quiz' as 'quiz' | 'assignment' | 'exam',
-      due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      total_points: 100,
-      description: 'Test assessment created by automated test' // optional field
-    };
+    class_id: classesResult.data[0].id,
+    title: `Assessment Test ${new Date().toISOString()}`,
+    type: 'quiz' as 'quiz' | 'assignment' | 'exam',
+    date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // Changed from due_date to date
+    description: 'Test assessment created by automated test'
+    // Remove total_points as it's not in the schema
+};
     
     logObject('Creating assessment with data', newAssessmentData);
     const createAssessmentResult = await handleTestStep(
@@ -156,7 +156,7 @@ const runTests = async () => {
     const updateAssessmentData = {
       title: `${newAssessmentData.title} (Updated)`,
       description: 'Updated test assessment description',
-      due_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+      date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
     };
 
     logObject('Updating assessment with data', updateAssessmentData);
@@ -174,9 +174,9 @@ const runTests = async () => {
     currentOperation.value = 'Testing Scores';
     
     const newScoreData: CreateScoreData = {
-      student_id: '3', // Convert to string
+      student_id: 3,
       assessment_id: assessmentId,
-      score: 95.5,
+      score_value: 95.5,
       feedback: 'Excellent work on the test assessment!'
     };
 
@@ -194,7 +194,7 @@ const runTests = async () => {
 
     // Update score
     const updateScoreData = {
-      score: 97.0,
+      score_value: 97.0,
       feedback: 'Updated feedback - Outstanding performance!'
     };
 
