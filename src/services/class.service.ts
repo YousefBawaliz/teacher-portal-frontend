@@ -1,7 +1,7 @@
 import api from './api';
 import type { ApiResponse, PaginatedResponse } from '@/types/api.types';
 
-interface Class {
+export interface Class {
   id: string;
   course_id: string;
   teacher_id: string;
@@ -14,7 +14,7 @@ interface Class {
   student_count: number;
 }
 
-interface ClassDetails extends Class {
+export interface ClassDetails extends Class {
   course: {
     course_code: string;
     title: string;
@@ -26,7 +26,7 @@ interface ClassDetails extends Class {
   };
 }
 
-interface CreateClassData {
+export interface CreateClassData {
   course_id: string;
   name: string;
   section: string;
@@ -35,7 +35,7 @@ interface CreateClassData {
   end_date: string;
 }
 
-interface UpdateClassData {
+export interface UpdateClassData {
   name?: string;
   section?: string;
   schedule?: string;
@@ -44,7 +44,7 @@ interface UpdateClassData {
   is_active?: boolean;
 }
 
-interface ClassStats {
+export interface ClassStats {
   average_score: number;
   assessment_count: number;
   completion_rate: number;

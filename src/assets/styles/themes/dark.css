@@ -1,0 +1,18 @@
+.theme-dark {
+    --color-primary: #60A5FA;
+    --color-primary-light: #93C5FD;
+    --color-primary-dark: #3B82F6;
+    
+    --color-background: #1F2937;
+    --color-surface: #374151;
+    
+    --color-text-primary: #F9FAFB;
+    --color-text-secondary: #D1D5DB;
+    
+    --color-border: #4B5563;
+    
+    --color-success: #34D399;
+    --color-warning: #FBBF24;
+    --color-error: #F87171;
+    --color-info: #60A5FA;
+  }

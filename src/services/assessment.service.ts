@@ -1,7 +1,7 @@
 import api from './api';
 import type { ApiResponse, PaginatedResponse } from '@/types/api.types';
 
-interface Assessment {
+export interface Assessment {
   id: number;  // Changed from string to number to match backend
   class_id: number;  // Changed from string to number
   title: string;
@@ -14,7 +14,7 @@ interface Assessment {
   // Removed total_points and is_published as they're not in backend schema
 }
 
-interface CreateAssessmentData {
+export interface CreateAssessmentData {
   class_id: number;  // Changed from string to number
   title: string;
   description?: string;
@@ -23,7 +23,7 @@ interface CreateAssessmentData {
   // Removed total_points as it's not in backend schema
 }
 
-interface UpdateAssessmentData {
+export interface UpdateAssessmentData {
   title?: string;
   description?: string;
   type?: 'quiz' | 'assignment' | 'exam';

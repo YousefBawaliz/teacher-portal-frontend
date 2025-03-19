@@ -1,7 +1,7 @@
 import api from './api';
 import type { ApiResponse } from '@/types/api.types';
 
-interface Course {
+export interface Course {
   id: string;
   course_code: string;
   title: string;
@@ -9,13 +9,13 @@ interface Course {
   is_active: boolean;
 }
 
-interface CreateCourseData {
+export interface CreateCourseData {
   course_code: string;
   title: string;
   description?: string;
 }
 
-interface UpdateCourseData {
+export interface UpdateCourseData {
   title?: string;
   description?: string;
   is_active?: boolean;

@@ -1,0 +1,12 @@
+.theme-light {
+  --color-primary: #3B82F6;  --color-primary-light: #60A5FA;
+  --color-primary-dark: #2563EB;  
+  --color-background: #F5F7FA;  --color-surface: #FFFFFF;
+    --color-text-primary: #1F2937;
+  --color-text-secondary: #6B7280;  
+  --color-border: #E5E7EB;  
+  --color-success: #10B981;  --color-warning: #FBBF24;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+}
+

@@ -1,7 +1,7 @@
 import api from './api';
 import type { User, ApiResponse } from '@/types/api.types';
 
-interface UpdateUserProfile {
+export interface UpdateUserProfile {
   first_name?: string;
   last_name?: string;
   email?: string;
