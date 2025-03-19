@@ -37,12 +37,22 @@ const routes: RouteRecordRaw[] = [
       }
     ]
   },
-  // {
-  //   path: '/:pathMatch(.*)*',
-  //   name: 'not-found',
-  //   component: () => import('@/pages/NotFoundPage.vue'),
-  //   meta: { title: '404 Not Found' }
-  // }
+  // Move store-test route to root level
+  {
+    path: '/store-test',
+    component: MainLayout,
+    name: 'store-test',
+    meta: { 
+      title: 'Store Tests',
+      requiresAuth: true
+    },
+    children: [
+      {
+        path: '',
+        component: () => import('../pages/StoreTestPage.vue')
+      }
+    ]
+  }
 ]
 
 const router = createRouter({
@@ -79,6 +89,8 @@ router.beforeEach(async (to, from, next) => {
 })
 
 export default router
+
+
 
 
 

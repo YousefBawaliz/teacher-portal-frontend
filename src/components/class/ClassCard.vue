@@ -1,34 +1,72 @@
 <template>
   <div class="class-card" :class="{ 'is-active': isActive }">
+    <div class="card-status-indicator" :class="statusClass"></div>
     <div class="class-header">
-      <div class="class-info">
-        <h3 class="class-title">{{ stats?.courseCode }}</h3>
-        <p class="class-subtitle">{{ stats?.courseTitle }}</p>
+      <div class="class-code">{{ classStats?.courseCode }}</div>
+      <div class="class-title">{{ classStats?.courseTitle }}</div>
+    </div>
+
+    <div class="class-metrics">
+      <div class="metric">
+        <UserGroupIcon class="metric-icon" />
+        <div class="metric-value">{{ classStats?.studentCount || 0 }}</div>
+        <div class="metric-label">Students</div>
       </div>
-      <div class="class-status" :class="statusClass">
-        {{ isActive ? 'Active' : 'Inactive' }}
+      <div class="metric">
+        <DocumentTextIcon class="metric-icon" />
+        <div class="metric-value">{{ getAssignmentCount }}</div>
+        <div class="metric-label">Assignments</div>
+      </div>
+      <div class="metric">
+        <ChartBarIcon class="metric-icon" />
+        <div class="metric-value">{{ getAverageScore }}%</div>
+        <div class="metric-label">Avg. Score</div>
       </div>
     </div>
 
-    <div class="class-stats">
-      <div class="stat-item">
-        <span class="stat-label">Students</span>
-        <span class="stat-value">{{ stats?.studentCount || 0 }}</span>
+    <div class="completion-section">
+      <div class="completion-label">
+        <span>Completion</span>
+        <span>{{ getCompletionRate }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div 
+          class="progress-fill" 
+          :style="{ width: `${getCompletionRate}%` }"
+          :class="getCompletionClass"
+        ></div>
       </div>
     </div>
 
-    <div class="class-actions">
+    <div class="class-footer">
+      <div class="last-activity">
+        <ClockIcon class="icon-small" />
+        <span>Last updated {{ getLastUpdateTime }}</span>
+      </div>
       <router-link :to="`/class/${classData.id}`" class="btn-view">
-        View Details
+        <ArrowRightIcon class="icon-small" />
       </router-link>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useClassStats } from '@/composables/useClassStats'
 import type { Class } from '@/services/class.service'
+import { 
+  UserGroupIcon, 
+  DocumentTextIcon, 
+  ChartBarIcon, 
+  ClockIcon,
+  ArrowRightIcon
+} from '@heroicons/vue/24/outline'
+
+interface ClassStats {
+  studentCount: number
+  courseTitle: string
+  courseCode: string
+}
 
 const props = defineProps<{
   classData: {
@@ -39,8 +77,7 @@ const props = defineProps<{
 }>()
 
 const { getClassStats } = useClassStats()
-
-const stats = ref<{ studentCount: number; courseTitle: string; courseCode: string; } | null>(null)
+const classStats = ref<ClassStats | null>(null)
 
 const isActive = computed(() => props.classData.is_active)
 
@@ -49,106 +86,203 @@ const statusClass = computed(() => ({
   'status-inactive': !isActive.value
 }))
 
-onMounted(async () => {
-  stats.value = await getClassStats(props.classData.id)
+const loadClassStats = async () => {
+  classStats.value = await getClassStats(props.classData.id)
+}
+
+onMounted(() => {
+  loadClassStats()
+})
+
+// Mock data for demonstration
+const getAssignmentCount = computed(() => {
+  return Math.floor(Math.random() * 10) + 1
+})
+
+const getAverageScore = computed(() => {
+  return Math.floor(Math.random() * 30) + 70
+})
+
+const getCompletionRate = computed(() => {
+  return Math.floor(Math.random() * 40) + 60
+})
+
+const getCompletionClass = computed(() => {
+  const rate = getCompletionRate.value
+  if (rate >= 80) return 'completion-high'
+  if (rate >= 60) return 'completion-medium'
+  return 'completion-low'
+})
+
+const getLastUpdateTime = computed(() => {
+  return '2 hours ago'
 })
 </script>
 
 <style scoped>
 .class-card {
-  background-color: var(--color-surface);
+  background-color: white;
   border-radius: 12px;
-  border: 1px solid var(--color-border);
-  padding: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .class-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-status-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.status-active {
+  background: linear-gradient(90deg, #56ab2f, #a8e063);
+}
+
+.status-inactive {
+  background: linear-gradient(90deg, #FF416C, #FF4B2B);
 }
 
 .class-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
+  padding: 20px 20px 15px 20px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.class-code {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6B7280;
+  margin-bottom: 5px;
 }
 
 .class-title {
   font-size: 18px;
   font-weight: 600;
-  margin: 0;
-  color: var(--color-text-primary);
+  color: #1F2937;
 }
 
-.class-subtitle {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin: 4px 0 0 0;
-}
-
-.class-status {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-active {
-  background-color: var(--color-success);
-  opacity: 0.1;
-  color: var(--color-success);
-}
-
-.status-inactive {
-  background-color: var(--color-error);
-  opacity: 0.1;
-  color: var(--color-error);
-}
-
-.class-stats {
+.class-metrics {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 15px 20px;
 }
 
-.stat-item {
+.metric {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
-.stat-label {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  margin-bottom: 4px;
+.metric-icon {
+  width: 20px;
+  height: 20px;
+  color: #6B7280;
+  margin-bottom: 5px;
 }
 
-.stat-value {
-  font-size: 16px;
+.metric-value {
+  font-size: 18px;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: #1F2937;
 }
 
-.class-actions {
+.metric-label {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.completion-section {
+  padding: 0 20px 15px 20px;
+}
+
+.completion-label {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #6B7280;
+  margin-bottom: 5px;
+}
+
+.progress-bar {
+  height: 6px;
+  background-color: #F3F4F6;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.completion-high {
+  background: linear-gradient(90deg, #56ab2f, #a8e063);
+}
+
+.completion-medium {
+  background: linear-gradient(90deg, #f39c12, #f1c40f);
+}
+
+.completion-low {
+  background: linear-gradient(90deg, #FF416C, #FF4B2B);
+}
+
+.class-footer {
+  margin-top: auto;
+  padding: 15px 20px;
+  border-top: 1px solid #F3F4F6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.last-activity {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #9CA3AF;
+}
+
+.icon-small {
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
 }
 
 .btn-view {
-  padding: 8px 16px;
-  border-radius: 6px;
-  background-color: var(--color-primary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #3B82F6;
   color: white;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
 .btn-view:hover {
-  background-color: var(--color-primary-dark);
+  background-color: #2563EB;
+  transform: scale(1.05);
+}
+
+.btn-view .icon-small {
+  width: 16px;
+  height: 16px;
+  margin-right: 0;
 }
 </style>
 

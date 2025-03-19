@@ -10,6 +10,16 @@ export interface Score {
   feedback?: string;
   created_at: string;
   updated_at: string;
+  assessment: {
+    id: number;
+    title: string;
+    type: string;
+  };
+  student: {
+    id: number;
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export interface CreateScoreData {
@@ -57,6 +67,10 @@ export class ScoreService {
 
   // Get a student's score by assessment title
   static async getStudentScoreByAssessment(studentId: number, assessmentTitle: string): Promise<Score> {
+    if (!assessmentTitle) {
+      throw new Error('Assessment title is required');
+    }
+    
     const response = await api.get<Score>(`/api/scores/student/${studentId}/assessment`, {
       params: { title: assessmentTitle }
     });

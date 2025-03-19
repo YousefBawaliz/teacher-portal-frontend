@@ -30,7 +30,8 @@ export const useUserStore = defineStore('user', {
       this.error = null
       try {
         const response = await UserService.getAllUsers(page, perPage)
-        this.users = response.data
+        // Since we know the response follows ApiResponse<User[]> format
+        this.users = response.data || []
         return response
       } catch (error) {
         this.error = (error as ApiError).message
@@ -67,3 +68,4 @@ export const useUserStore = defineStore('user', {
     }
   }
 })
+

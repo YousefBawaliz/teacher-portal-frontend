@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { ScoreState, ApiError } from '@/types/store.types'
 import { ScoreService, type Score, type CreateScoreData, type UpdateScoreData } from '@/services/score.service'
+import { AssessmentService, type Assessment } from '@/services/assessment.service'
 
 export const useScoreStore = defineStore('score', {
   state: (): ScoreState => ({
@@ -52,13 +53,24 @@ export const useScoreStore = defineStore('score', {
       }
     },
 
-    async fetchScoresByAssessment(assessmentId: number) {
+    async fetchScoresByAssessment(studentId: number, assessmentId: number) {
       this.loading = true
       this.error = null
       try {
-        const scores = await ScoreService.getStudentScoreByAssessment(assessmentId, '')  // Note: This needs assessment title
-        this.scores = [scores]  // Wrapping in array since the service returns a single score
-        return scores
+        const assessment = await AssessmentService.getAssessment(assessmentId)
+        if (!assessment?.title) {
+          throw new Error('Assessment title not found')
+        }
+
+        const score = await ScoreService.getStudentScoreByAssessment(studentId, assessment.title)
+        
+        // Validate the response matches our expected structure
+        if (!score.assessment || score.assessment.id !== assessmentId) {
+          throw new Error('Invalid score data received')
+        }
+
+        this.scores = [score]
+        return score
       } catch (error) {
         this.error = (error as ApiError).message
         throw error
@@ -101,3 +113,6 @@ export const useScoreStore = defineStore('score', {
     }
   }
 })
+
+
+

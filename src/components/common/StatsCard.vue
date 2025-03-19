@@ -1,6 +1,6 @@
 <template>
-  <div class="stats-card">
-    <div class="stats-icon" :class="`stats-icon-${type}`">
+  <div class="stats-card" :class="`stats-card-${type}`">
+    <div class="stats-icon">
       <slot name="icon"></slot>
     </div>
     <div class="stats-content">
@@ -35,6 +35,9 @@
         </svg>
         <span>{{ formatTrend(trend) }}</span>
       </div>
+    </div>
+    <div class="background-icon">
+      <slot name="icon"></slot>
     </div>
   </div>
 </template>
@@ -77,7 +80,7 @@ const trendClass = computed(() => ({
 
 const formatTrend = (value: number) => {
   const prefix = value > 0 ? '+' : ''
-  return `${prefix}${value}% from previous period`
+  return `${prefix}${value}%`
 }
 
 const animateValue = (start: number, end: number, duration: number) => {
@@ -101,37 +104,77 @@ const animateValue = (start: number, end: number, duration: number) => {
 }
 
 watch(() => props.value, (newValue, oldValue) => {
-  animateValue(oldValue, newValue, 1000)
+  animateValue(oldValue, newValue, 800)
 })
 
 onMounted(() => {
-  animateValue(0, props.value, 1000)
+  animateValue(0, props.value, 800)
 })
 </script>
 
 <style scoped>
 .stats-card {
-  height: 120px;
-  padding: 16px;
-  background-color: var(--color-surface);
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  display: flex;
   position: relative;
+  padding: 25px 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stats-card-info {
+  border-top: 4px solid #3B82F6;
+}
+
+.stats-card-success {
+  border-top: 4px solid #10B981;
+}
+
+.stats-card-warning {
+  border-top: 4px solid #F59E0B;
+}
+
+.stats-card-danger {
+  border-top: 4px solid #EF4444;
 }
 
 .stats-icon {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
+}
+
+.stats-card-info .stats-icon {
+  background: linear-gradient(135deg, #3B82F6, #60A5FA);
+}
+
+.stats-card-success .stats-icon {
+  background: linear-gradient(135deg, #10B981, #34D399);
+}
+
+.stats-card-warning .stats-icon {
+  background: linear-gradient(135deg, #F59E0B, #FBBF24);
+}
+
+.stats-card-danger .stats-icon {
+  background: linear-gradient(135deg, #EF4444, #F87171);
 }
 
 .stats-icon svg {
@@ -139,54 +182,30 @@ onMounted(() => {
   height: 24px;
 }
 
-.stats-icon-info {
-  background-color: var(--color-info);
-  opacity: 0.15;
-  color: var(--color-info);
-}
-
-.stats-icon-success {
-  background-color: var(--color-success);
-  opacity: 0.15;
-  color: var(--color-success);
-}
-
-.stats-icon-warning {
-  background-color: var(--color-warning);
-  opacity: 0.15;
-  color: var(--color-warning);
-}
-
-.stats-icon-danger {
-  background-color: var(--color-error);
-  opacity: 0.15;
-  color: var(--color-error);
-}
-
 .stats-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  z-index: 2;
 }
 
 .stats-title {
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: #6B7280;
   margin: 0 0 8px 0;
 }
 
 .stats-value {
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-size: 32px;
+  font-weight: 700;
+  color: #1F2937;
+  margin-bottom: 8px;
 }
 
 .stats-trend {
   display: flex;
   align-items: center;
   font-size: 14px;
-  margin-top: 8px;
+  font-weight: 500;
 }
 
 .trend-icon {
@@ -196,10 +215,19 @@ onMounted(() => {
 }
 
 .trend-positive {
-  color: var(--color-success);
+  color: #10B981;
 }
 
 .trend-negative {
-  color: var(--color-error);
+  color: #EF4444;
+}
+
+.background-icon {
+  position: absolute;
+  bottom: -15px;
+  right: -15px;
+  z-index: 1;
+  transform: scale(3);
+  opacity: 0.05;
 }
 </style>
