@@ -1,26 +1,40 @@
 <template>
   <header class="app-header">
-    <div class="header-left">
-      <img src="@/assets/images/logo.png" alt="Logo" class="header-logo" />
+    <div class="university-logo">
+      <span class="logo-dot"></span>
+      <span class="logo-dot"></span>
+      <h1>Jordan University</h1>
     </div>
-
-    <div class="header-right">
-      <button class="theme-toggle" @click="toggleTheme">
-        <i-sun v-if="theme === 'dark'" />
-        <i-moon v-else />
-      </button>
-
-      <div class="profile-dropdown" v-click-outside="closeDropdown">
-        <button class="profile-button" @click="toggleDropdown">
-          <span class="user-name">{{ userFullName }}</span>
-          <i-chevron-down :class="{ 'rotate-180': isDropdownOpen }" />
+    <div class="header-controls">
+      <div class="theme-toggle">
+        <input 
+          type="checkbox" 
+          id="theme-toggle" 
+          v-model="isDarkTheme" 
+          @change="toggleTheme" 
+          class="toggle-input"
+        />
+        <label for="theme-toggle" class="toggle-label">
+          <span class="visually-hidden">Toggle dark theme</span>
+        </label>
+      </div>
+      <div class="notification-bell">
+        <button class="bell-button" aria-label="Notifications">
+          <i class="notification-icon">🔔</i>
         </button>
-
-        <div v-show="isDropdownOpen" class="dropdown-menu">
-          <button class="dropdown-item" @click="handleLogout">
-            <i-logout class="item-icon" />
-            Logout
-          </button>
+      </div>
+      <div class="user-profile" @click="toggleProfileMenu">
+        <span class="username">{{ userName }}</span>
+        <div class="profile-icon">
+          <i class="user-icon">👤</i>
+          <i class="dropdown-icon">▼</i>
+        </div>
+        <div class="profile-menu" v-if="showProfileMenu">
+          <ul>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Settings</a></li>
+            <li><a href="#" @click.prevent="logout">Logout</a></li>
+          </ul>
         </div>
       </div>
     </div>
@@ -28,142 +42,178 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth.store'
-import { useTheme } from '@/composables/useTheme'
-import { computed } from 'vue'
+import { ref, computed } from 'vue';
+import { useAuthStore } from '@/stores/auth.store';
 
-const router = useRouter()
-const authStore = useAuthStore()
-const { theme, toggleTheme } = useTheme()
+const authStore = useAuthStore();
+const userName = computed(() => authStore.userFullName || 'John Doe');
+const isDarkTheme = ref(false);
+const showProfileMenu = ref(false);
 
-const isDropdownOpen = ref(false)
-const userFullName = computed(() => authStore.userFullName)
+const toggleTheme = () => {
+  const theme = isDarkTheme.value ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  // Save preference to user profile if needed
+};
 
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value
-}
+const toggleProfileMenu = () => {
+  showProfileMenu.value = !showProfileMenu.value;
+};
 
-const closeDropdown = () => {
-  isDropdownOpen.value = false
-}
-
-const handleLogout = async () => {
+const logout = async () => {
   try {
-    await authStore.logout()
-    router.push('/login')
+    await authStore.logout();
+    // Redirect to login page
+    window.location.href = '/login';
   } catch (error) {
-    console.error('Logout failed:', error)
+    console.error('Logout failed', error);
   }
-}
+};
 </script>
 
 <style scoped>
 .app-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 64px;
-  background-color: white;
-  border-bottom: 1px solid #E5E7EB;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
-  z-index: 1000;
+  align-items: center;
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  padding: 0 1.25rem;
+  height: 3.5rem;
+  width: 100%;
 }
 
-.header-left {
+.university-logo {
   display: flex;
   align-items: center;
 }
 
-.header-logo {
-  height: 36px;
+.logo-dot {
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+  margin-right: 5px;
 }
 
-.header-right {
+.university-logo h1 {
+  font-size: 1.2rem;
+  margin-left: 0.5rem;
+}
+
+.header-controls {
   display: flex;
   align-items: center;
-  gap: 16px;
 }
 
 .theme-toggle {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  color: var(--color-text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin-right: 1.5rem;
 }
 
-.profile-dropdown {
+.toggle-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-label {
   position: relative;
+  display: inline-block;
+  width: 2.5rem;
+  height: 1.25rem;
+  background-color: #806d9e;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.profile-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
+.toggle-label::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1rem;
+  height: 1rem;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.toggle-input:checked + .toggle-label::after {
+  transform: translateX(1.25rem);
+}
+
+.notification-bell {
+  margin-right: 1.5rem;
+}
+
+.bell-button {
   background: none;
   border: none;
+  color: var(--text-light);
   cursor: pointer;
-  color: #1F2937;
+  font-size: 1.25rem;
 }
 
-.user-name {
-  font-size: 14px;
-  font-weight: 500;
+.user-profile {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
 }
 
-/* Add these new styles for icons */
-:deep(svg) {
-  width: 20px;
-  height: 20px;
+.username {
+  margin-right: 0.5rem;
 }
 
-.item-icon {
-  width: 16px !important;
-  height: 16px !important;
+.profile-icon {
+  display: flex;
+  align-items: center;
 }
 
-/* Update dropdown styles to use CSS variables */
-.dropdown-menu {
+.user-icon {
+  margin-right: 0.25rem;
+}
+
+.dropdown-icon {
+  font-size: 0.75rem;
+}
+
+.profile-menu {
   position: absolute;
   top: 100%;
   right: 0;
-  margin-top: 4px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  min-width: 200px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 150px;
+  z-index: 10;
+  margin-top: 0.5rem;
 }
 
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 12px 16px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  color: var(--color-text-primary);
-  font-size: var(--text-sm);
-  text-align: left;
+.profile-menu ul {
+  list-style: none;
+  padding: 0.5rem 0;
 }
 
-.dropdown-item:hover {
-  background-color: var(--color-background);
+.profile-menu li {
+  padding: 0.5rem 1rem;
 }
 
-.rotate-180 {
-  transform: rotate(180deg);
+.profile-menu a {
+  color: var(--text-primary);
+  text-decoration: none;
+  display: block;
+}
+
+.profile-menu a:hover {
+  color: var(--primary-color);
+}
+
+@media (max-width: 600px) {
+  .username {
+    display: none;
+  }
 }
 </style>

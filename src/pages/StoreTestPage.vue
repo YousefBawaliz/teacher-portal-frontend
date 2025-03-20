@@ -198,18 +198,41 @@ const runTests = async () => {
     // Test 6: Score Store
     currentOperation.value = 'Testing Score Store';
     const scoreResult = await handleTestStep('Fetch scores', async () => {
-      // Don't use the current user's ID if they're a teacher
-      // Instead, we need to fetch a valid student ID
-      const studentId = 3; // Using the known valid student ID
+      const studentId = 3; // Known valid student ID
       
-      const assessment = assessmentStore.assessments.find(a => a.title === 'Quiz 1');
-      if (!assessment) throw new Error('Quiz 1 assessment not found');
+      // Create first score for Assessment 1
+      await scoreStore.createScore({
+        student_id: studentId,
+        assessment_id: 1,
+        score_value: 85.5,
+        feedback: "Good performance on first assessment"
+      });
+
+      // Create second score for Assessment 2
+      await scoreStore.createScore({
+        student_id: studentId,
+        assessment_id: 2,
+        score_value: 92.0,
+        feedback: "Excellent work on second assessment"
+      });
+
+      // Fetch all scores for the student
+      await scoreStore.fetchScoresByStudent(studentId);
       
-      await scoreStore.fetchScoresByAssessment(studentId, assessment.id);
+      // Validate we have both scores
+      const studentScores = scoreStore.scores;
+      if (!studentScores || studentScores.length !== 2) {
+        throw new Error('Expected exactly 2 scores for student');
+      }
+
+      // Fetch specific score by assessment
+      const score1 = await scoreStore.fetchScoresByAssessment(studentId, 1);
+      const score2 = await scoreStore.fetchScoresByAssessment(studentId, 2);
       
       return {
-        scores: scoreStore.scores,
-        assessmentTitle: assessment.title
+        allScores: studentScores,
+        assessment1Score: score1,
+        assessment2Score: score2
       };
     });
 
@@ -217,6 +240,16 @@ const runTests = async () => {
       throw new Error('Score store test failed');
     }
     logObject('Score store state', scoreResult.data);
+
+    // // Cleanup scores
+    // currentOperation.value = 'Cleaning up scores';
+    // await handleTestStep('Delete test scores', async () => {
+    //   const scores = scoreStore.scores;
+    //   for (const score of scores) {
+    //     await scoreStore.deleteScore(score.id);
+    //   }
+    //   return true;
+    // });
 
     // Cleanup
     currentOperation.value = 'Cleanup';
@@ -291,6 +324,7 @@ const runTests = async () => {
   cursor: not-allowed;
 }
 </style>
+
 
 
 
